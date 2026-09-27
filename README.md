@@ -42,4 +42,9 @@ the provenance-blend policy reached 88.7% balanced accuracy, with 77.4% AI
 recall and 0.0% real-image false-positive rate. This is a prototype benchmark,
 not a claim of universal performance.
 
-![Benchmark confusion matrix](confusion_matrix_comparison.png)
+The benchmark graphic below compares the external-only detector with the
+provenance blend using clearly separated predicted-label headings.
+
+![Updated benchmark confusion matrix](./confusion_matrix_comparison.png)
+
+[Open the full-size confusion matrix](./confusion_matrix_comparison.png)
