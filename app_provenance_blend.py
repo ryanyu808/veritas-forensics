@@ -34,9 +34,9 @@ AI_SOFTWARE_MARKERS = (
     "comfy ui",
 )
 HUMAN_LEANING_LABELS = {
-    "POSSIBLY HUMAN",
+    "HUMAN-LEANING",
     "LIKELY HUMAN",
-    "HIGHLY LIKELY HUMAN",
+    "STRONG HUMAN SIGNAL",
 }
 
 # Enables decoding of iPhone HEIC/HEIF uploads. It does not alter analysis.
@@ -52,16 +52,16 @@ st.write(
 
 def six_tier_label(signal):
   if signal >= 0.975:
-    return "HIGHLY LIKELY AI", "Strong AI-leaning evidence across the blended signal."
+    return "STRONG AI SIGNAL", "Strong AI-leaning evidence across the blended signal."
   if signal >= 0.965:
     return "LIKELY AI", "The blended evidence favors AI generation."
   if signal >= 0.90:
-    return "POSSIBLY AI", "The visual signal is AI-leaning, but not conclusive."
+    return "AI-LEANING", "The visual signal is AI-leaning, but not conclusive."
   if signal >= 0.75:
-    return "POSSIBLY HUMAN", "The evidence is mixed and slightly human-leaning."
+    return "HUMAN-LEANING", "The evidence is mixed and slightly human-leaning."
   if signal >= 0.50:
     return "LIKELY HUMAN", "The blended evidence leans human."
-  return "HIGHLY LIKELY HUMAN", "The blended evidence shows a low AI signal."
+  return "STRONG HUMAN SIGNAL", "The blended evidence shows a low AI signal."
 
 
 def normalize_metadata_text(value):
@@ -91,7 +91,7 @@ def detect_ai_software_tag(metadata):
 def enforce_software_floor(label, explanation, ai_software_tag):
   if ai_software_tag and label in HUMAN_LEANING_LABELS:
     return (
-        "POSSIBLY AI",
+        "AI-LEANING",
         "An AI-generator software tag was found, so the result cannot be classified as human-leaning.",
     )
   return label, explanation
@@ -337,9 +337,9 @@ if uploaded_file is not None:
               "Missing EXIF is neutral. Camera metadata can be edited or copied and never proves an image is human-made."
           )
 
-        if label == "HIGHLY LIKELY AI":
+        if label == "STRONG AI SIGNAL":
           st.error("Strong synthetic-image evidence detected.")
-        elif label in {"LIKELY AI", "POSSIBLY AI"}:
+        elif label in {"LIKELY AI", "AI-LEANING"}:
           st.warning("The blended evidence is AI-leaning.")
         else:
           st.success("The blended evidence is human-leaning.")
