@@ -277,7 +277,7 @@ uploaded_file = st.file_uploader(
 
 if uploaded_file is not None:
   image = read_uploaded_image(uploaded_file)
-  st.image(image, caption="Analyzed Image", use_container_width=True)
+  st.image(image, use_container_width=True)
 
   if st.button("Run Provenance + Forensic Scan", use_container_width=True):
     with st.spinner("Running visual, camera metadata, and Benford checks..."):
