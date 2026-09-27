@@ -221,10 +221,10 @@ def camera_evidence_summary(metadata):
 def plain_language_takeaway(label):
   """Human-readable display only; it does not change the assessment."""
   if label in {"STRONG AI SIGNAL", "LIKELY AI", "AI-LEANING"}:
-    return "What this means: This image shows evidence consistent with AI generation."
+    return "What This Means: This image shows evidence consistent with AI generation."
   if label == "HUMAN-LEANING":
-    return "What this means: The evidence leans human, but some signals are mixed."
-  return "What this means: This image shows little evidence of AI generation."
+    return "What This Means: The evidence leans human, but some signals are mixed."
+  return "What This Means: This image shows little evidence of AI generation."
 
 
 @st.cache_resource
@@ -426,10 +426,10 @@ if uploaded_file is not None:
           )
           st.divider()
           st.markdown(
-              "**What influenced this result:**\n\n"
-              f"- **Visual analysis:** {visual_evidence_summary(external_signal)}\n"
-              f"- **Image pattern check:** {benford_evidence_summary(benford_points)}\n"
-              f"- **Camera information:** {camera_evidence_summary(metadata)}"
+              "**What Influenced This Result:**\n\n"
+              f"- **Visual Analysis:** {visual_evidence_summary(external_signal)}\n"
+              f"- **Image Pattern Check:** {benford_evidence_summary(benford_points)}\n"
+              f"- **Camera Information:** {camera_evidence_summary(metadata)}"
           )
           st.info(plain_language_takeaway(label))
 
@@ -438,21 +438,21 @@ if uploaded_file is not None:
                 "AI-Generator Software Tag Detected. This metadata is editable and is treated as supporting evidence."
             )
 
-        with st.expander("Why we reached this result", expanded=False):
+        with st.expander("Why We Reached This Result", expanded=False):
           st.write(
-              f"**Blended evidence score:** {final_signal:.3f} (not a probability)"
+              f"**Blended Evidence Score:** {final_signal:.3f} (not a probability)"
           )
-          st.write(f"**Primary visual signal:** {external_signal * 100:.1f}%")
-          st.write(f"**Pixel-pattern check:** {benford_points * 100:+.1f} points")
-          st.write(f"**AI software metadata adjustment:** {software_boost * 100:+.1f} points")
+          st.write(f"**Primary Visual Signal:** {external_signal * 100:.1f}%")
+          st.write(f"**Pixel-Pattern Check:** {benford_points * 100:+.1f} points")
+          st.write(f"**AI Software Metadata Adjustment:** {software_boost * 100:+.1f} points")
           st.write(
-              f"**Camera information effect:** {-camera_points * 100:+.1f} points - {camera_note}"
+              f"**Camera Information Effect:** {-camera_points * 100:+.1f} points - {camera_note}"
           )
           st.caption(
               "Missing camera information is neutral. It can also be edited or copied and never proves an image is human-made."
           )
 
-        with st.expander("Image information", expanded=False):
+        with st.expander("Image Information", expanded=False):
           if metadata:
             for name, value in metadata.items():
               st.write(f"**{name}:** {value}")
