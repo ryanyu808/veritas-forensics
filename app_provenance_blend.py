@@ -101,35 +101,44 @@ def enforce_software_floor(label, explanation, ai_software_tag):
 def visual_evidence_summary(signal):
   """Human-readable display only; it does not change the detector score."""
   if signal >= 0.90:
-    return "Strongly AI-leaning"
+    return "Strong AI-like signal"
   if signal >= 0.75:
-    return "AI-leaning"
+    return "AI-like signal"
   if signal >= 0.50:
-    return "Mixed"
-  return "Human-leaning"
+    return "Mixed signal"
+  return "Low AI-like signal"
 
 
 def benford_evidence_summary(points):
   """Human-readable display only; it does not change the Benford adjustment."""
   if points >= 0.02:
-    return "Elevated drift"
+    return "More variation than expected"
   if points <= -0.02:
-    return "Low drift"
-  return "Neutral drift"
+    return "Less variation than expected"
+  return "Within the expected range"
 
 
 def camera_evidence_summary(metadata):
   """Human-readable display only; it does not change the metadata adjustment."""
   if has_valid_camera_metadata(metadata):
-    return "Complete record"
+    return "Camera details and capture time found"
   if (
       has_metadata_value(metadata, "Camera Make")
       and has_metadata_value(metadata, "Camera Model")
   ):
-    return "Camera identified"
+    return "Camera details found"
   if has_metadata_value(metadata, "Creation Timestamp"):
-    return "Timestamp only"
-  return "Not embedded"
+    return "Capture timestamp found"
+  return "No camera information found"
+
+
+def plain_language_takeaway(label):
+  """Human-readable display only; it does not change the assessment."""
+  if label in {"STRONG AI SIGNAL", "LIKELY AI", "AI-LEANING"}:
+    return "What this means: This image shows evidence consistent with AI generation."
+  if label == "HUMAN-LEANING":
+    return "What this means: The evidence leans human, but some signals are mixed."
+  return "What this means: This image shows little evidence of AI generation."
 
 
 @st.cache_resource
@@ -329,23 +338,31 @@ if uploaded_file is not None:
             "Veritas reports an evidence-based assessment, not a probability or proof of origin."
         )
 
+        st.markdown(
+            "**What influenced this result:**\n\n"
+            f"- **Visual analysis:** {visual_evidence_summary(external_signal)}\n"
+            f"- **Image pattern check:** {benford_evidence_summary(benford_points)}\n"
+            f"- **Camera information:** {camera_evidence_summary(metadata)}"
+        )
+        st.info(plain_language_takeaway(label))
+
         if ai_software_tag:
           st.warning(
               "AI-Generator Software Tag Detected. This metadata is editable and is treated as supporting evidence."
           )
 
-        with st.expander("Explainable Adjustments", expanded=False):
+        with st.expander("Why we reached this result", expanded=False):
           st.write(
               f"**Blended evidence score:** {final_signal:.3f} (not a probability)"
           )
           st.write(f"**Primary visual signal:** {external_signal * 100:.1f}%")
-          st.write(f"**Benford adjustment:** {benford_points * 100:+.1f} points")
+          st.write(f"**Pixel-pattern check:** {benford_points * 100:+.1f} points")
           st.write(f"**AI software metadata adjustment:** {software_boost * 100:+.1f} points")
           st.write(
-              f"**Camera Metadata Evidence adjustment:** {-camera_points * 100:+.1f} points - {camera_note}"
+              f"**Camera information effect:** {-camera_points * 100:+.1f} points - {camera_note}"
           )
           st.caption(
-              "Missing EXIF is neutral. Camera metadata can be edited or copied and never proves an image is human-made."
+              "Missing camera information is neutral. It can also be edited or copied and never proves an image is human-made."
           )
 
         if label == "STRONG AI SIGNAL":
@@ -355,7 +372,7 @@ if uploaded_file is not None:
         else:
           st.success("The blended evidence is human-leaning.")
 
-        with st.expander("EXIF Metadata Inspector", expanded=False):
+        with st.expander("Image information", expanded=False):
           if metadata:
             for name, value in metadata.items():
               st.write(f"**{name}:** {value}")
