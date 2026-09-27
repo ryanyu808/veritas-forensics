@@ -1,5 +1,6 @@
 """Experimental Veritas blend: ConvNeXt primary + Benford + camera metadata."""
 
+import gc
 import re
 from pathlib import Path
 
@@ -133,6 +134,9 @@ def camera_evidence_summary(metadata):
 
 @st.cache_resource
 def load_detector():
+  # Keep CPU inference and checkpoint loading within Streamlit Community
+  # Cloud's memory budget without changing the detector or its output.
+  torch.set_num_threads(1)
   checkpoint_path = CHECKPOINT_PATH
   if not checkpoint_path.exists():
     try:
@@ -149,8 +153,15 @@ def load_detector():
           "could not be downloaded automatically."
       ) from error
   model = timm.create_model("convnextv2_base", pretrained=False, num_classes=2)
-  checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+  checkpoint = torch.load(
+      checkpoint_path,
+      map_location="cpu",
+      weights_only=True,
+      mmap=True,
+  )
   model.load_state_dict(checkpoint["model"])
+  del checkpoint
+  gc.collect()
   model.eval()
   transform = transforms.Compose([
       transforms.Resize(288),
