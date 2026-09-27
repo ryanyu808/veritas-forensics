@@ -318,11 +318,6 @@ if uploaded_file is not None:
               "AI-Generator Software Tag Detected. This metadata is editable and is treated as supporting evidence."
           )
 
-        first, second, third = st.columns(3)
-        first.metric("Visual evidence", visual_evidence_summary(external_signal))
-        second.metric("Benford pattern", benford_evidence_summary(benford_points))
-        third.metric("Camera metadata", camera_evidence_summary(metadata))
-
         with st.expander("Explainable Adjustments", expanded=False):
           st.write(
               f"**Blended evidence score:** {final_signal:.3f} (not a probability)"
