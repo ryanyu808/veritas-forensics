@@ -1,0 +1,9 @@
+numpy
+Pillow
+pillow-heif
+streamlit
+torch
+torchvision
+transformers
+safetensors
+timm

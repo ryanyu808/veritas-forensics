@@ -1,0 +1,9 @@
+# This repository is intentionally a small, public demo package.
+# Ignore every workspace file unless explicitly allowed below.
+*
+
+!.gitignore
+!README.md
+!requirements.txt
+!app_provenance_blend.py
+!confusion_matrix_comparison.png
