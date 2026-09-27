@@ -16,6 +16,87 @@ from pillow_heif import register_heif_opener
 
 st.set_page_config(page_title="Veritas Provenance Blend", layout="centered")
 
+st.markdown(
+    """
+    <style>
+      .block-container {
+        max-width: 880px;
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+      }
+      .veritas-hero {
+        margin-bottom: 1.5rem;
+        padding: 1.35rem 1.5rem;
+        border: 1px solid rgba(37, 99, 235, 0.28);
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(14, 165, 233, 0.04));
+      }
+      .veritas-eyebrow {
+        margin: 0 0 0.35rem;
+        color: #2563eb;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+      }
+      .veritas-hero h1 {
+        margin: 0;
+        font-size: clamp(2rem, 5vw, 2.7rem);
+        line-height: 1.08;
+      }
+      .veritas-hero p:last-child {
+        margin: 0.65rem 0 0;
+        max-width: 650px;
+        font-size: 1.04rem;
+        opacity: 0.82;
+      }
+      [data-testid="stFileUploader"] {
+        padding: 0.35rem 0.6rem;
+        border: 1px dashed rgba(37, 99, 235, 0.42);
+        border-radius: 14px;
+        background: rgba(37, 99, 235, 0.035);
+      }
+      .stButton > button {
+        min-height: 2.9rem;
+        border: 0;
+        border-radius: 10px;
+        background: #2563eb;
+        color: #ffffff;
+        font-size: 1rem;
+        font-weight: 700;
+      }
+      .stButton > button:hover {
+        background: #1d4ed8;
+        color: #ffffff;
+      }
+      [data-testid="stImage"] img {
+        border-radius: 14px;
+      }
+      [data-testid="stExpander"] {
+        border-radius: 12px;
+      }
+      .assessment-eyebrow {
+        margin: 0 0 0.35rem;
+        color: #2563eb;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+      }
+      @media (max-width: 640px) {
+        .block-container {
+          padding-top: 1rem;
+          padding-left: 1rem;
+          padding-right: 1rem;
+        }
+        .veritas-hero {
+          padding: 1.1rem;
+          border-radius: 14px;
+        }
+      }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 ROOT = Path(__file__).resolve().parent
 EXTERNAL_ROOT = ROOT / "external_models" / "xrayon" / "AI Images Detector"
 CHECKPOINT_PATH = EXTERNAL_ROOT / "checkpoints" / "checkpoint_phase2.pth"
@@ -44,10 +125,15 @@ HUMAN_LEANING_LABELS = {
 register_heif_opener()
 
 
-st.title("Veritas: Provenance + Forensic Blend")
-st.write(
-    "Experimental triage: a pretrained visual detector is the primary signal; "
-    "Benford drift and camera metadata make small, explainable adjustments."
+st.markdown(
+    """
+    <div class="veritas-hero">
+      <p class="veritas-eyebrow">EXPLAINABLE IMAGE SCREENING</p>
+      <h1>Veritas</h1>
+      <p>Screen images for AI-generation signals and understand the evidence behind each assessment.</p>
+    </div>
+    """,
+    unsafe_allow_html=True,
 )
 
 
@@ -304,7 +390,7 @@ if uploaded_file is not None:
   image = read_uploaded_image(uploaded_file)
   st.image(image, use_container_width=True)
 
-  if st.button("Run Provenance + Forensic Scan", use_container_width=True):
+  if st.button("Analyze image", use_container_width=True):
     with st.spinner("Running visual, camera metadata, and Benford checks..."):
       try:
         external_signal = score_external_detector(image)
@@ -331,25 +417,26 @@ if uploaded_file is not None:
             ai_software_tag,
         )
 
-        st.subheader("Forensic Assessment")
-        st.markdown(f"### Assessment: {label}")
-        st.caption(explanation)
-        st.caption(
-            "Veritas reports an evidence-based assessment, not a probability or proof of origin."
-        )
-
-        st.markdown(
-            "**What influenced this result:**\n\n"
-            f"- **Visual analysis:** {visual_evidence_summary(external_signal)}\n"
-            f"- **Image pattern check:** {benford_evidence_summary(benford_points)}\n"
-            f"- **Camera information:** {camera_evidence_summary(metadata)}"
-        )
-        st.info(plain_language_takeaway(label))
-
-        if ai_software_tag:
-          st.warning(
-              "AI-Generator Software Tag Detected. This metadata is editable and is treated as supporting evidence."
+        with st.container(border=True):
+          st.markdown('<p class="assessment-eyebrow">IMAGE AUTHENTICITY ASSESSMENT</p>', unsafe_allow_html=True)
+          st.markdown(f"## {label}")
+          st.write(explanation)
+          st.caption(
+              "Veritas provides an evidence-based screening result, not proof of an image's origin."
           )
+          st.divider()
+          st.markdown(
+              "**What influenced this result:**\n\n"
+              f"- **Visual analysis:** {visual_evidence_summary(external_signal)}\n"
+              f"- **Image pattern check:** {benford_evidence_summary(benford_points)}\n"
+              f"- **Camera information:** {camera_evidence_summary(metadata)}"
+          )
+          st.info(plain_language_takeaway(label))
+
+          if ai_software_tag:
+            st.warning(
+                "AI-Generator Software Tag Detected. This metadata is editable and is treated as supporting evidence."
+            )
 
         with st.expander("Why we reached this result", expanded=False):
           st.write(
@@ -364,13 +451,6 @@ if uploaded_file is not None:
           st.caption(
               "Missing camera information is neutral. It can also be edited or copied and never proves an image is human-made."
           )
-
-        if label == "STRONG AI SIGNAL":
-          st.error("Strong synthetic-image evidence detected.")
-        elif label in {"LIKELY AI", "AI-LEANING"}:
-          st.warning("The blended evidence is AI-leaning.")
-        else:
-          st.success("The blended evidence is human-leaning.")
 
         with st.expander("Image information", expanded=False):
           if metadata:
