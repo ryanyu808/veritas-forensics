@@ -19,15 +19,20 @@ python -m pip install -r requirements.txt
 streamlit run app_provenance_blend.py
 ```
 
-The external model checkpoint is intentionally not included in this repository:
-it is approximately 1 GB and must be placed at:
+The external model checkpoint is intentionally not included in this repository
+because it is approximately 1 GB. When the local checkpoint is present, the
+app uses it from:
 
 ```text
 external_models/xrayon/AI Images Detector/checkpoints/checkpoint_phase2.pth
 ```
 
-Obtain model files through their original distribution and comply with their
-applicable terms before deploying.
+When that file is absent, the app downloads it automatically from the official
+public [xRayon ConvNeXt AI Images Detector model repository](https://huggingface.co/xRayon/convnext-ai-images-detector)
+and caches it for the running environment. The model repository identifies the
+checkpoint as MIT-licensed; retain that attribution when redistributing the
+prototype. The first cloud scan can take longer because the checkpoint is
+approximately 1 GB.
 
 ## Important limitation
 

@@ -8,6 +8,7 @@ import streamlit as st
 import timm
 import torch
 import torchvision.transforms as transforms
+from huggingface_hub import hf_hub_download
 from PIL import ExifTags, Image, ImageOps
 from pillow_heif import register_heif_opener
 
@@ -17,6 +18,8 @@ st.set_page_config(page_title="Veritas Provenance Blend", layout="centered")
 ROOT = Path(__file__).resolve().parent
 EXTERNAL_ROOT = ROOT / "external_models" / "xrayon" / "AI Images Detector"
 CHECKPOINT_PATH = EXTERNAL_ROOT / "checkpoints" / "checkpoint_phase2.pth"
+MODEL_REPO_ID = "xRayon/convnext-ai-images-detector"
+MODEL_FILENAME = "AI Images Detector/checkpoints/checkpoint_phase2.pth"
 BENFORD_PROBS = np.array([np.log10(1 + 1 / digit) for digit in range(1, 10)])
 
 AI_SOFTWARE_MARKERS = (
@@ -130,10 +133,23 @@ def camera_evidence_summary(metadata):
 
 @st.cache_resource
 def load_detector():
-  if not CHECKPOINT_PATH.exists():
-    raise FileNotFoundError(f"Missing external checkpoint: {CHECKPOINT_PATH}")
+  checkpoint_path = CHECKPOINT_PATH
+  if not checkpoint_path.exists():
+    try:
+      checkpoint_path = Path(
+          hf_hub_download(
+              repo_id=MODEL_REPO_ID,
+              filename=MODEL_FILENAME,
+              repo_type="model",
+          )
+      )
+    except Exception as error:
+      raise FileNotFoundError(
+          "The local checkpoint is absent and the official xRayon checkpoint "
+          "could not be downloaded automatically."
+      ) from error
   model = timm.create_model("convnextv2_base", pretrained=False, num_classes=2)
-  checkpoint = torch.load(CHECKPOINT_PATH, map_location="cpu", weights_only=False)
+  checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
   model.load_state_dict(checkpoint["model"])
   model.eval()
   transform = transforms.Compose([
