@@ -285,6 +285,11 @@ uploaded_file = st.file_uploader(
     "Upload an image (PNG, JPG, or HEIC - up to 200 MB)",
     type=["png", "jpg", "jpeg", "heic", "heif"],
 )
+st.caption(
+    "Best results: upload the original image file when possible. Screenshots "
+    "of social-media pages, app interfaces, or images with large UI/text areas "
+    "may be less reliable because Veritas analyzes the entire screenshot."
+)
 
 if uploaded_file is not None:
   image = read_uploaded_image(uploaded_file)
