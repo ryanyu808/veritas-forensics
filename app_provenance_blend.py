@@ -129,9 +129,9 @@ register_heif_opener()
 st.markdown(
     """
     <div class="veritas-hero">
-      <p class="veritas-eyebrow">EXPLAINABLE IMAGE SCREENING</p>
+      <p class="veritas-eyebrow">AI IMAGE AUTHENTICITY</p>
       <h1>Veritas</h1>
-      <p>Screen images for AI-generation signals and understand the evidence behind each assessment.</p>
+      <p>Check an image for AI-generation signals and see the evidence behind the result.</p>
     </div>
     """,
     unsafe_allow_html=True,
