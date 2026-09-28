@@ -102,6 +102,7 @@ EXTERNAL_ROOT = ROOT / "external_models" / "xrayon" / "AI Images Detector"
 CHECKPOINT_PATH = EXTERNAL_ROOT / "checkpoints" / "checkpoint_phase2.pth"
 MODEL_REPO_ID = "xRayon/convnext-ai-images-detector"
 MODEL_FILENAME = "AI Images Detector/checkpoints/checkpoint_phase2.pth"
+MODEL_CACHE_DIR = Path("/tmp/veritas-hf-cache")
 BENFORD_PROBS = np.array([np.log10(1 + 1 / digit) for digit in range(1, 10)])
 
 AI_SOFTWARE_MARKERS = (
@@ -240,6 +241,7 @@ def load_detector():
               repo_id=MODEL_REPO_ID,
               filename=MODEL_FILENAME,
               repo_type="model",
+              cache_dir=str(MODEL_CACHE_DIR),
           )
       )
     except Exception as error:
