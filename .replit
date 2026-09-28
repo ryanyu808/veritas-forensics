@@ -1,6 +1,0 @@
-entrypoint = "app_provenance_blend.py"
-run = "streamlit run app_provenance_blend.py --server.address 0.0.0.0 --server.port 8501"
-
-[deployment]
-run = ["streamlit", "run", "app_provenance_blend.py", "--server.address", "0.0.0.0", "--server.port", "8501"]
-deploymentTarget = "cloudrun"
