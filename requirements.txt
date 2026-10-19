@@ -1,7 +1,8 @@
 numpy
 Pillow
 pillow-heif
-streamlit
+# 1.40 adds st.image(use_container_width=...) used by the existing UI.
+streamlit==1.40.2
 torch
 torchvision
 transformers

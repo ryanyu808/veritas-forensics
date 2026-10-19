@@ -14,10 +14,39 @@ the result as proof of an image's origin.
 
 ## Run locally
 
+Use Python **3.11** for the deployment-compatible environment.
+
 ```powershell
 python -m pip install -r requirements.txt
 streamlit run app_provenance_blend.py
 ```
+
+## Streamlit Community Cloud deployment
+
+Deploy `ryanyu808/veritas-forensics`, branch `main`, with entry point
+`app_provenance_blend.py`. In **Advanced settings**, explicitly select
+**Python 3.11** and use the custom subdomain `veritas-forensics-808`.
+
+For an existing deployment using Python 3.14, changing `requirements.txt` or
+rebooting does not change the Python interpreter. Follow Streamlit's
+[Python version change instructions](https://docs.streamlit.io/deploy/streamlit-community-cloud/manage-your-app/upgrade-python):
+save the existing subdomain and any secrets, delete the Cloud app, then redeploy
+the same repository, branch, entry point, and subdomain with Python 3.11 selected
+in Advanced settings. Restore any secrets during redeployment. This retains
+the public address `https://veritas-forensics-808.streamlit.app/`.
+
+`requirements.txt` pins Streamlit 1.40.2, the patch release in the earliest
+release family supporting the existing `st.image(use_container_width=True)`
+UI. Streamlit 1.22.0 imports `imghdr`, which Python removed in 3.13; it also
+lacks the image-width and container-border APIs used here. Python 3.11 alone
+therefore does not make Streamlit 1.22.0 sufficient for this application.
+No `imghdr` shim or application code change is needed. The AI dependencies,
+checkpoint, preprocessing, scoring rules, and UI code are unchanged.
+
+There is no repository `.streamlit/config.toml`; Streamlit's defaults apply.
+Select Python in the Cloud deployment dialog; a Streamlit TOML setting cannot
+choose the interpreter. After deployment, confirm the logs report Python 3.11
+and Streamlit 1.40.2, then upload an image and run a scan.
 
 The external model checkpoint is intentionally not included in this repository
 because it is approximately 1 GB. When the local checkpoint is present, the
